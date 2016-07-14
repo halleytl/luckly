@@ -51,7 +51,7 @@ class Engine(BaseEngine):
         if filename:
             return open(self.get_file(inf_name)).read().format(**self.param_format(**request.query_arguments))
         else:
-            raise AssertionError("File %s.sql not found!" % inf_name)
+            raise IOError("File %s.sql not found!" % inf_name)
 
     def search(self, inf_name, request):
         sql = self.show(inf_name , request)
