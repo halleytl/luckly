@@ -27,7 +27,13 @@ class BaseEngine():
         """
         调试信息
         """
-        return self.show(inf_name, request)
+        file_path = self.get_file(inf_name)
+        file_content = open(file_path).read()
+        p = "/".join(file_path.split("/")[-3:])
+        content = self.show(inf_name, request)
+        req = request.__dict__
+        header = request.headers.__dict__
+        return {"header":header, "request":str(req), "content":content, "file_path":p, "file_content":file_content}
 
     def struct(self, show_type, request):
         """
