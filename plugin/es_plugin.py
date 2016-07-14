@@ -1,12 +1,10 @@
 #-*-coding:u8
-import torndb
 from __init__ import BaseEngine
 
 
 class Engine(BaseEngine):
-    def __init__(self, alias=None, **kwargs):
+    def __init__(self, **kwargs):
         self.kwargs = kwargs
-        self.alias = alias
         self.host = self.kwargs.get("host", "127.0.0.1" )
         self.port = self.kwargs.get("port", "3306")
         self.db = self.kwargs.get("db") 
@@ -40,21 +38,18 @@ class Engine(BaseEngine):
         key_struct = self._struct(querys)
         return { k: operator_format(op, value, key_type=key_struct[k]) for k in st}
 
-    def show(self, inf_name, request):
+    def show(self, inf_name, **params):
         """
         show/shop/brand_info?__ecs_business_info__business_id__in=1,2,3
         show/shop/brand_info?__ecs_business_info__business_id__in=1,2,3
         """
 
         #print torndb.MySQLdb.escape_string(data) 
-        filename = self.get_file(inf_name)
-        if filename:
-            return open(self.get_file(inf_name)).read().format(**self.param_format(**request.query_arguments))
-        else:
-            raise AssertionError("File %s.sql not found!" % inf_name)
+        res = open(inf_name + ".sql").read().format(**self.param_format(**params))
+        return res
 
-    def search(self, inf_name, request):
-        sql = self.show(inf_name , request)
+    def search(self, inf_name, **params):
+        sql = self.show(inf_name , **params)
         return self.get_conn().query(sql)
 
     def _struct(self, querys, show_type=None):
@@ -77,8 +72,8 @@ class Engine(BaseEngine):
                     res.append(r[0]) 
         return res
 
-    def struct(self, show_type=None, request=None):
-        querys = request.query_arguments.get("search")
+    def struct(self, show_type=None, **kwargs):
+        querys = kwargs.get("search")
         return self._struct(querys, show_type)
 
 def operator_format(op, value, key_type="none", con_type="mysql"):
@@ -126,7 +121,6 @@ def get_type(key_type):
         return "string"
     else:
         return key_type
-
 
     
 

@@ -75,52 +75,42 @@ def get_engine(db_name):
     info = dbs.get(db_name)
     engine_type = info.get("type", "mysql")
     module = importlib.import_module("plugin."+ engine_type + "_plugin")
-    return module.Engine(**info)
+    return module.Engine(db_name, **info)
 
 class ShowHandler(tornado.web.RequestHandler):
     """
     显示接口查询语句
-    http://127.0.0.1:8888/show/shop/brand_info?ecs_business_info__business_id=1
-    http://127.0.0.1:8888/show/shop/brand_info?ecs_business_info__business_id__in_bulk=1,2,3
-    http://127.0.0.1:8888/show/shop/brand_info?ecs_business_info__business_id__not_in_bulk=1,2,3
-
     """
     def get(self, db_name, inf_name):
         
-        self.write(get_engine(db_name).show(os.path.join(os.getcwd(), "sqls", inf_name), **self.request.query_arguments))
+        self.write(get_engine(db_name).show(inf_name, self.request))
 
 class InfHandler(tornado.web.RequestHandler):
     """
     查询数据
-    http://127.0.0.1:8888/inf/shop/brand_info?ecs_business_info__business_id=1
-
     """
     def get(self, db_name, inf_name):
         engine = get_engine(db_name)
-        res = engine.search(os.path.join(os.getcwd(), "sqls", inf_name), **self.request.query_arguments)
+        res = engine.search(inf_name, self.request)
         self.write(jd(res))
 
 class StructHandler(tornado.web.RequestHandler):
     """
     获得某个数据库某个表中字段的类型
-    http://127.0.0.1:8888/struct/shop/simple?search=common.categories_v2.cid&search=common.categories_v2.name
     """
     def get(self, db_name, show_type=None):
         """
         show FULL COLUMNS from shop.ecs_business_info where Field="business_id"
         """
         engine = get_engine(db_name)
-        res = engine.struct(show_type, **self.request.query_arguments)
+        res = engine.struct(show_type, self.request)
         self.write(jd(res))
 
 class DebugHandler(tornado.web.RequestHandler):
     """
     """
     def get(self, db_name, inf_name):
-        """
-        http://127.0.0.1:8888/debug/shop/brand_info?ecs_business_info__business_id=1
-        """
-        self.write( get_engine(db_name).debug(os.path.join(os.getcwd(), "sqls", inf_name), **self.request.query_arguments))
+        self.write(get_engine(db_name).debug(inf_name, self.request))
 
 
 application = tornado.web.Application([
