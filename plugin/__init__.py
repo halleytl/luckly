@@ -17,6 +17,9 @@ class BaseEngine():
         """
         pass
 
+    def __str__(self):
+        return "nothing info"
+
     def search(self, inf_name, request):
         """
         返回执行结果
@@ -38,7 +41,8 @@ class BaseEngine():
             "request":str(req), 
             "content":content, 
             "file_path":p, 
-            "file_content":file_content
+            "file_content":file_content,
+            "base": str(self)
         }
 
     def struct(self, show_type, request):
