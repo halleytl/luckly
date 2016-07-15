@@ -5,6 +5,8 @@ import tornado.ioloop
 import tornado.web
 import time
 from tornado.options import options
+from tornado import gen
+
 import os
 import torndb
 import json
@@ -12,6 +14,7 @@ import decimal
 import sys
 import importlib
 from config import dbs
+
 
 def decimal_default(obj):
     if isinstance(obj, decimal.Decimal):
@@ -57,6 +60,7 @@ class MainHandler(tornado.web.RequestHandler):
     """
     首页
     """
+    @gen.coroutine
     def get(self):
         inf = {
             "show": "http://127.0.0.1:8888/show/shop/brand_info?__ecs_business_info__business_id=1",
@@ -81,6 +85,7 @@ class ShowHandler(tornado.web.RequestHandler):
     """
     显示接口查询语句
     """
+    @gen.coroutine
     def get(self, db_name, inf_name):
         
         self.write(get_engine(db_name).show(inf_name, self.request))
@@ -89,6 +94,7 @@ class InfHandler(tornado.web.RequestHandler):
     """
     查询数据
     """
+    @gen.coroutine
     def get(self, db_name, inf_name):
         engine = get_engine(db_name)
         res = engine.search(inf_name, self.request)
@@ -98,6 +104,7 @@ class StructHandler(tornado.web.RequestHandler):
     """
     获得某个数据库某个表中字段的类型
     """
+    @gen.coroutine
     def get(self, db_name, show_type=None):
         """
         show FULL COLUMNS from shop.ecs_business_info where Field="business_id"

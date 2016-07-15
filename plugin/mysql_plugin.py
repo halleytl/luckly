@@ -19,6 +19,15 @@ class Engine(BaseEngine):
             self.db,
             user=self.user,
             password=self.password)
+    def __str__(self):
+        return "mysql://{user}:{password}@{host}:{port}/{db}".format(
+            host = self.host,
+            port = self.port,
+            db = self.db,
+            user=self.user,
+            password=self.password)
+
+
 
     def param_format(self, **params):
         """
@@ -63,7 +72,7 @@ class Engine(BaseEngine):
             for query in querys:
                 db, table, key = query.strip().split(".")
                 sql = "show FULL COLUMNS from {db}.{table} where Field='{key}'".format(db=db,table=table,key=key)
-                r = self.get_conn().query(sql)
+                r =  self.get_conn().query(sql)
                 if r:
                     res["%s__%s" % (table, r[0]["Field"])] = get_type(r[0]["Type"])
 
